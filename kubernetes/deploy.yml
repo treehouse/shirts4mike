@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: shirts4mike
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: shirts4mike
+        tier: frontend
+    spec:
+      imagePullSecrets:
+      - name: treehousedeployer
+      containers:
+      - name: shirts4mike
+        image: treehouse/shirts4mike:latest
+        imagePullPolicy: Always
+        ports:
+        - name: httpd
+          containerPort: 80
+        livenessProbe:
+          tcpSocket:
+            port: httpd
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            port: httpd
+            path: /index.php
+          initialDelaySeconds: 15
+          periodSeconds: 30
