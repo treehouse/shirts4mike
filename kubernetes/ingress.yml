@@ -1,0 +1,16 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: shirts4mike
+  # Assumes a global static ip with the same name exists.
+  # You can acquire a static IP by running
+  # gcloud compute addresses create console --global
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "shirts4mike"
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.allow-http: "true"
+spec:
+  backend:
+    serviceName: shirts4mike-frontend
+    servicePort: 80
