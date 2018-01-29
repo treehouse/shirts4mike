@@ -5,7 +5,7 @@ metadata:
   name: shirts4mike
   # Assumes a global static ip with the same name exists.
   # You can acquire a static IP by running
-  # gcloud compute addresses create console --global
+  # gcloud compute addresses create shirts4mike --global
   annotations:
     kubernetes.io/ingress.global-static-ip-name: "shirts4mike"
     kubernetes.io/ingress.class: "gce"
