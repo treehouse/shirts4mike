@@ -1,10 +1,19 @@
----
-apiVersion: apps/v1beta1
+
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: shirts4mike
+  labels:
+    app: shirts4mike
+    tier: frontend
 spec:
+  strategy:
+    type: RollingUpdate
   replicas: 2
+  selector:
+    matchLabels:
+      app: shirts4mike
+      tier: frontend
   template:
     metadata:
       labels:
@@ -31,3 +40,6 @@ spec:
             path: /index.php
           initialDelaySeconds: 15
           periodSeconds: 30
+
+---
+
