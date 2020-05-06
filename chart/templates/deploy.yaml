@@ -1,3 +1,4 @@
+---
 
 apiVersion: apps/v1
 kind: Deployment
@@ -24,8 +25,8 @@ spec:
       - name: treehousedeployer
       containers:
       - name: shirts4mike
-        image: treehouse/shirts4mike:latest
-        imagePullPolicy: Always
+        image: {{ .Values.image }}
+        imagePullPolicy: IfNotPresent
         ports:
         - name: httpd
           containerPort: 80
@@ -40,6 +41,4 @@ spec:
             path: /index.php
           initialDelaySeconds: 15
           periodSeconds: 30
-
----
 

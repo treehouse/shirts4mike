@@ -1,3 +1,4 @@
+---
 
 apiVersion: v1
 kind: Service
@@ -10,6 +11,4 @@ spec:
     tier: frontend
   ports:
   - port: 80
-
----
 
