@@ -1,0 +1,3 @@
+hostname: shirts4mike.dev.trhou.se
+image: treehouse/shirts4mike:latest
+replicas: 1

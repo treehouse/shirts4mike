@@ -1,26 +1,27 @@
+---
 
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: shirts4mike
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/common-name: {{ .Values.hostname }}
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
-    nginx.ingress.kubernetes.io/server-alias: shirts4mike.com,www.shirts4mike.com
-    external-dns.alpha.kubernetes.io/hostname: shirts4mike.com,www.shirts4mike.com
+    nginx.ingress.kubernetes.io/server-alias: {{ .Values.hostname }},www.{{ .Values.hostname }}
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.hostname }},www.{{ .Values.hostname }}
 spec:
   tls:
   - secretName: shirts4mike-crt
     hosts:
-    - shirts4mike.com
+    - {{ .Values.hostname }}
   rules:
-  - host: shirts4mike.com
+  - host: {{ .Values.hostname }}
     http:
       paths:
       - path: /
         backend:
           serviceName: shirts4mike
           servicePort: 80
-
----
 
