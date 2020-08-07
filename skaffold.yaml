@@ -1,5 +1,5 @@
 ---
-apiVersion: skaffold/v2beta1
+apiVersion: skaffold/v2beta6
 kind: Config
 metadata:
   name: shirts4mike
@@ -8,20 +8,20 @@ build:
   - image: treehouse/shirts4mike
     sync:
       manual:
-      - src: 'src/**/*'
-        dest: '/var/www/html'
-        strip: 'src/'
+      - src: src/**/*
+        dest: /var/www/html
+        strip: src/
 deploy:
-  kubeContext: minikube
   helm:
     releases:
     - name: shirts4mike
       chartPath: chart
-      namespace: default
-      values:
-        image: treehouse/shirts4mike
       valuesFiles:
       - minikube.values.yaml
+      artifactOverrides:
+        image: treehouse/shirts4mike
+      namespace: default
+  kubeContext: minikube
 portForward:
 - resourceType: service
   resourceName: shirts4mike
@@ -29,20 +29,20 @@ portForward:
   localPort: 8080
 profiles:
 - name: staging
-  deploy:
-    kubeContext: staging
   patches:
   - op: replace
     path: /deploy/helm/releases/0/valuesFiles/0
     value: staging.values.yaml
+  deploy:
+    kubeContext: staging
 - name: production
+  patches:
+  - op: replace
+    path: /deploy/helm/releases/0/valuesFiles/0
+    value: production.values.yaml
   build:
     tagPolicy:
       gitCommit:
         variant: CommitSha
   deploy:
     kubeContext: production
-  patches:
-  - op: replace
-    path: /deploy/helm/releases/0/valuesFiles/0
-    value: production.values.yaml
