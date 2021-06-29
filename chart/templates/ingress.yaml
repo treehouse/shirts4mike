@@ -1,6 +1,6 @@
 ---
 
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: shirts4mike
@@ -22,7 +22,10 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: shirts4mike
-          servicePort: 80
+          service:
+            name: shirts4mike
+            port:
+              number: 80
 
