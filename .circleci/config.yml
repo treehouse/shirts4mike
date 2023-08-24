@@ -1,26 +1,60 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
 version: 2.1
-
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
+orbs:
+  aws-cli: circleci/aws-cli@4.0.0
+  aws-ecr: circleci/aws-ecr@8.2.1
+  aws-ecs: circleci/aws-ecs@3.2.0
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/configuration-reference/#executor-job
-    docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/configuration-reference/#steps
+  build:
+    parameters:
+      role:
+        type: string
+        default: "arn:aws:iam::629370713955:role/circleci"
+      tags:
+        type: string
+        default: "latest"
+    executor: aws-ecr/default
     steps:
-      - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+      - aws-ecr/build-and-push-image:
+          repo: shirts4mike
+          assume-web-identity: true
+          role-arn: << parameters.role >>
+          tag: << pipeline.git.revision >>,<< parameters.tags >>
+  deploy:
+    parameters:
+      environment:
+        type: string
+      role:
+        type: string
+        default: "arn:aws:iam::629370713955:role/circleci"
+      service-name:
+        type: string
+        default: demo_shirts
+      family:
+        type: string
+    executor: aws-cli/default
+    steps:
+      - aws-cli/setup:
+          role_arn: << parameters.role >>
+      - aws-ecs/update-service:
+          family: << parameters.family >>
+          service-name: << parameters.service-name >>
+          cluster: ecs-<< parameters.environment >>
+          force-new-deployment: true
+          verify-revision-is-deployed: true
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  version: 2
+  deploy:
     jobs:
-      - say-hello
+      - build:
+          context: treehouse private
+          tags: latest
+          filters:
+            branches:
+              only: master
+      - deploy:
+          context: treehouse private
+          requires: [build]
+          service-name: demo_shirts
+          family: demo_shirts
+          environment: production
